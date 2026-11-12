@@ -1,0 +1,57 @@
+{
+  "name": "antevemus/aspecification-br",
+  "description": "Brazilian documents satellite of antevemus/aspecification: leaf specifications for CPF, CNPJ (numeric and alphanumeric), CEP, phone number, vehicle plate (legacy and Mercosur) and CNJ court process number, with check digits, exact masked or unmasked forms, codec registration and failure messages that never repeat the candidate",
+  "type": "library",
+  "license": "MIT",
+  "homepage": "https://github.com/antevemus-it/Antevemus.ASpecificationBr",
+  "support": {
+    "source": "https://github.com/antevemus-it/Antevemus.ASpecificationBr",
+    "issues": "https://github.com/antevemus-it/Antevemus.ASpecificationBr/issues",
+    "docs": "https://github.com/antevemus-it/Antevemus.ASpecificationBr#readme"
+  },
+  "keywords": [
+    "specification",
+    "specification-pattern",
+    "validation",
+    "brazil",
+    "cpf",
+    "cnpj",
+    "cnpj-alfanumerico",
+    "cep",
+    "mercosul",
+    "cnj",
+    "php82"
+  ],
+  "authors": [
+    {
+      "name": "Heliton Junior - CTO @ Antevemus Soluções Inovadoras em TI Ltda.",
+      "email": "contato@antevemus.com.br",
+      "homepage": "https://antevemus.com.br"
+    }
+  ],
+  "require": {
+    "php": "^8.2",
+    "antevemus/aspecification": "^2.13"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^11.0",
+    "infection/infection": "^0.31.9 || ^0.35.6"
+  },
+  "autoload": {
+    "psr-4": {
+      "Antevemus\\ASpecificationBr\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Antevemus\\ASpecificationBr\\Tests\\": "tests/"
+    }
+  },
+  "minimum-stability": "stable",
+  "prefer-stable": true,
+  "config": {
+    "allow-plugins": {
+      "infection/extension-installer": false
+    }
+  }
+}

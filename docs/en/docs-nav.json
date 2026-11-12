@@ -1,0 +1,61 @@
+{
+  "items": [
+    {
+      "text": "Home",
+      "path": "index"
+    },
+    {
+      "text": "Getting started",
+      "items": [
+        {
+          "text": "Installation and quick start",
+          "path": "getting-started/index"
+        }
+      ]
+    },
+    {
+      "text": "Concepts",
+      "items": [
+        {
+          "text": "Forms, check digits and secrecy",
+          "path": "concepts/forms-and-check-digits"
+        }
+      ]
+    },
+    {
+      "text": "API reference",
+      "items": [
+        {
+          "text": "CPF and CNPJ",
+          "path": "api/taxpayer-ids"
+        },
+        {
+          "text": "CEP and phone number",
+          "path": "api/address-and-phone"
+        },
+        {
+          "text": "Vehicle plate and CNJ process number",
+          "path": "api/vehicle-and-court"
+        }
+      ]
+    },
+    {
+      "text": "Quality",
+      "items": [
+        {
+          "text": "Tests",
+          "path": "quality/tests"
+        }
+      ]
+    },
+    {
+      "text": "Project",
+      "items": [
+        {
+          "text": "Roadmap",
+          "path": "project/roadmap"
+        }
+      ]
+    }
+  ]
+}
