@@ -15,7 +15,7 @@ namespace Antevemus\ASpecificationBr\Internal;
  *
  * The routines added in 1.1.0 (CNH, PIS/PASEP, voter registration number and RENAVAM) follow the public
  * descriptions named in the docblock of each one, and say there what could not be checked against the text of
- * an official norm (none of the four has its check digits published in one).
+ * an official norm (none of the four has the weights of its check digits published in one).
  *
  * @internal Not part of the public API; the specifications are.
  *
@@ -202,22 +202,32 @@ final class CheckDigits
     }
 
     /**
-     * Whether twelve digits are a voter registration number (título de eleitor): an eight-digit sequence, the
-     * code of the state (01 to 28: 01 is SP, 02 is MG, 28 is abroad) and two check digits, the first over the
-     * sequence weighted 2 to 9 and the second over the state code and the first check digit weighted 7, 8 and
-     * 9. TSE Resolution 20.132/1998 sets what each digit is computed over (the sequence; the state code
-     * followed by the first digit); the weights and the rule of the remainders are those of public
-     * descriptions of the TSE routine: each digit is the remainder modulo 11, a remainder of 10 gives 0, and a
-     * remainder of 0 gives 1 for SP and MG (0 elsewhere). The repetitions fail the state code or the
-     * arithmetic.
+     * Whether a string of digits is a voter registration number (título de eleitor).
      *
-     * @param string $value Twelve characters
-     * @return bool True when the state code and both check digits are right
+     * TSE Resolution 23.659/2021, art. 36, sole paragraph: the number has up to twelve digits, an eight-digit
+     * sequence whose leading zeros are dropped at issuance, the code of the state of origin (01 to 28: 01 is
+     * SP, 02 is MG, 28 is abroad) and two check digits by "Módulo 11", the first over the sequence and the
+     * last over the state code followed by the first check digit. So 5 to 12 digits are accepted (at least
+     * one sequence digit) and read left-padded with zeros to twelve; the twelve-digit form with the zeros
+     * written is the same number. A sequence of zeros is refused: no inscription is number zero.
+     *
+     * The resolution does not give the weights nor the rule of the remainders; they are those of public
+     * descriptions of the TSE routine: the sequence weighted 2 to 9, the state code and the first check digit
+     * weighted 7, 8 and 9, each digit the remainder modulo 11, a remainder of 10 giving 0 and a remainder of 0
+     * giving 1 for SP and MG (0 elsewhere).
+     *
+     * @param string $value Five to twelve characters
+     * @return bool True when the sequence, the state code and both check digits are right
      */
     public static function isVoterId(string $value): bool
     {
-        if (preg_match('/^[0-9]{12}$/D', $value) !== 1) {
+        if (preg_match('/^[0-9]{5,12}$/D', $value) !== 1) {
             return false;
+        }
+
+        $value = str_pad($value, 12, '0', STR_PAD_LEFT);
+        if (str_starts_with($value, '00000000')) {
+            return false; // no inscription is number zero
         }
 
         $state = (int) substr($value, 8, 2);

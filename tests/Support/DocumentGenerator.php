@@ -20,7 +20,8 @@ namespace Antevemus\ASpecificationBr\Tests\Support;
  * - PIS/PASEP: the complementary weights 8, 9, 2, 3, 4, 5, 6, 7, 8, 9 (eleven minus each weight of the rule),
  *   whose sum is minus the sum of the rule modulo 11, so the digit is that remainder (10 gives 0);
  * - voter registration number: the complementary weights (9 down to 2 over the sequence, 4, 3 and 2 over the
- *   state code and the first digit) and a table of the special remainders;
+ *   state code and the first digit) and a table of the special remainders, over a sequence of 1 to 8
+ *   significant digits (so with leading zeros on purpose), never zero;
  * - RENAVAM: Denatran's own writing, the ten digits reversed and weighted 2..9, 2, 3, ten times the sum
  *   modulo 11;
  * - PIX keys: the CPF and CNPJ above, a mobile number of the area codes above after "+55", an e-mail of the
@@ -199,10 +200,13 @@ final class DocumentGenerator
         return substr($digits, 0, 3) . '.' . substr($digits, 3, 5) . '.' . substr($digits, 8, 2) . '-' . substr($digits, 10, 1);
     }
 
-    /** Twelve digits of a voter registration number of the given state (1 to 28), or of any state. */
+    /**
+     * Twelve digits of a voter registration number of the given state (1 to 28), or of any state, with the
+     * leading zeros of the sequence written (strip them with ltrim() for the form of issuance).
+     */
     public static function voterId(?int $state = null): string
     {
-        $sequence = self::digits(8);
+        $sequence = sprintf('%08d', mt_rand(1, 10 ** mt_rand(1, 8) - 1));
         $code = sprintf('%02d', $state ?? mt_rand(1, 28));
         $special = in_array($code, ['01', '02'], true);
 

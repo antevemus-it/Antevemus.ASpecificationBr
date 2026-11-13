@@ -18,7 +18,7 @@ CPF, CNPJ, CEP, the CNJ process number and the PIS/PASEP have an official mask. 
 | `Masked` | Only the official mask, such as `###.###.###-##`. |
 | `Unmasked` | Only the bare characters. |
 
-The phone number has no single official writing: its specification accepts spaces, parentheses, hyphens, dots and one leading `+`, and reads the digits. The vehicle plate has its own two kinds (`PlateKind`). The CNH, the voter registration number and the RENAVAM have no official mask and are accepted as their digits only; a PIX key is written as the DICT stores it, without a mask, and its kinds are `PixKeyKind`.
+The phone number has no single official writing: its specification accepts spaces, parentheses, hyphens, dots and one leading `+`, and reads the digits. The vehicle plate has its own two kinds (`PlateKind`). The CNH, the voter registration number and the RENAVAM have no official mask and are accepted as their digits only (the voter registration number with or without the leading zeros of its sequence); a PIX key is written as the DICT stores it, without a mask, and its kinds are `PixKeyKind`.
 
 <!-- tested: forms -->
 ```php
@@ -49,7 +49,7 @@ BrSpec::cpf()->isSatisfiedBy(' 529.982.247-25'); // false (a leading space)
 | CNJ process number | Twenty digits, the segment of the judiciary from 1 to 9, the check digits (ISO 7064 MOD 97-10). | The court and the origin against a table. |
 | CNH | Eleven digits, not a repetition of one digit, both check digits (modulo 11, with the discount of the first on the second; a base whose second digit would be negative has no completion). | Whether the license was issued or is valid. |
 | PIS/PASEP | Eleven digits, not zeros, the check digit (modulo 11, weights 3, 2, 9, 8, 7, 6, 5, 4, 3, 2). | Whether the number was assigned. |
-| Voter registration number | Twelve digits, the state code from 01 to 28, both check digits (modulo 11, with the rule of SP and MG). | Whether the registration exists or is regular. |
+| Voter registration number | Up to twelve digits (the leading zeros of the sequence may be dropped), a sequence other than zero, the state code from 01 to 28, both check digits by "Módulo 11" (TSE Resolution 23.659/2021, art. 36; the weights and the rule of SP and MG from public descriptions of the TSE routine). | Whether the registration exists or is regular. |
 | RENAVAM | Eleven digits, not zeros, the check digit (modulo 11). | Whether the vehicle is registered. |
 | PIX key | The form the DICT stores for the kind: a CPF or a CNPJ (alphanumeric included) with their checks, a mobile number `+55` with an area code of the numbering plan, an e-mail in small letters of at most 77 characters, a UUID of RFC 4122 (version 1 to 5) in small letters. | Whether the key is registered in the DICT, or to whom. |
 

@@ -1,6 +1,6 @@
 # CNH, PIS/PASEP, Voter Registration and RENAVAM
 
-Four registration numbers of eleven or twelve digits, each with its check digits. Only the PIS/PASEP has an official mask, so it is the only one of the four with a `DocumentFormat`; the other three accept their digits only, and nothing is trimmed.
+Four registration numbers of up to twelve digits, each with its check digits. Only the PIS/PASEP has an official mask, so it is the only one of the four with a `DocumentFormat`; the other three accept their digits only, and nothing is trimmed.
 
 ## `BrSpec::cnh(): CnhSpecification`
 
@@ -22,11 +22,12 @@ A PIS/PASEP number, the same number the Caixa and the social security also write
 
 ## `BrSpec::voterId(): VoterIdSpecification`
 
-A voter registration number (*título de eleitor*): twelve digits, an eight-digit sequence, the code of the state and two check digits.
+A voter registration number (*título de eleitor*). TSE Resolution 23.659/2021, art. 36, sole paragraph, sets it as **up to twelve digits**: an eight-digit sequence whose leading zeros are dropped at issuance, the code of the state of origin and two check digits by "Módulo 11", the first over the sequence and the last over the state code followed by the first check digit.
 
-- **State code:** `01` to `28` (`01` is SP, `02` is MG, `28` is a voter abroad).
-- **First check digit:** over the sequence, weighted 2 to 9; **second:** over the state code and the first check digit, weighted 7, 8 and 9. Each is the remainder modulo 11; a remainder of 10 gives 0, and a remainder of 0 gives **1 for SP and MG** (0 elsewhere).
-- The card prints the number in three groups of four, but no norm sets a mask: write the twelve digits. The thirteen-digit numbers of some old registrations of SP and MG are not accepted.
+- **Written with or without the leading zeros:** a string of 5 to 12 digits (at least one digit of the sequence) is read left-padded with zeros to twelve, so `932305` and `000000932305` are the same number. A sequence of zeros is refused: no inscription is number zero. Thirteen digits or more, and four or fewer, are refused.
+- **State code:** `01` to `28` (`01` is SP, `02` is MG, `28` is a voter abroad), the table of the resolution.
+- **Weights and remainders:** the resolution does not give them; they are those of public descriptions of the TSE routine. The first check digit is over the sequence weighted 2 to 9, the second over the state code and the first check digit weighted 7, 8 and 9; each is the remainder modulo 11, a remainder of 10 gives 0, and a remainder of 0 gives **1 for SP and MG** (0 elsewhere).
+- The card prints the number in groups, but no norm sets a mask: write the digits only.
 
 ## `BrSpec::renavam(): RenavamSpecification`
 
@@ -51,6 +52,7 @@ BrSpec::cnh()->isSatisfiedBy('11111111111'); // false (a repetition)
 BrSpec::pis()->isSatisfiedBy('824.33543.31-5'); // true
 BrSpec::pis(DocumentFormat::Masked)->isSatisfiedBy('82433543315'); // false
 BrSpec::voterId()->isSatisfiedBy('847882780116'); // true (SP: a remainder of 0 gives 1)
+BrSpec::voterId()->isSatisfiedBy('932305'); // true (the leading zeros of the sequence dropped, as issued)
 BrSpec::voterId()->isSatisfiedBy('818187202941'); // false (no state 29)
 BrSpec::renavam()->isSatisfiedBy('00144546329'); // true (a nine-digit RENAVAM with its leading zeros)
 BrSpec::renavam()->isSatisfiedBy('144546329'); // false

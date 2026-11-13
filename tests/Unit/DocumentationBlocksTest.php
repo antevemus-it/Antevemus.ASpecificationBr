@@ -37,7 +37,7 @@ final class DocumentationBlocksTest extends TestCase
         'taxpayer-ids' => 7,
         'address-and-phone' => 8,
         'vehicle-and-court' => 5,
-        'registration-numbers' => 9,
+        'registration-numbers' => 10,
         'pix-keys' => 9,
     ];
 

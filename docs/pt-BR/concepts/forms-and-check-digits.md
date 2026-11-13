@@ -18,7 +18,7 @@ CPF, CNPJ, CEP, o número de processo do CNJ e o PIS/PASEP têm máscara oficial
 | `Masked` | Só a máscara oficial, como `###.###.###-##`. |
 | `Unmasked` | Só os caracteres, sem pontuação. |
 
-O telefone não tem uma escrita oficial única: a especificação dele aceita espaços, parênteses, hífens, pontos e um `+` no início, e lê os dígitos. A placa de veículo tem os seus dois tipos (`PlateKind`). A CNH, o título de eleitor e o RENAVAM não têm máscara oficial e são aceitos só como os seus dígitos; uma chave PIX é escrita como o DICT a guarda, sem máscara, e os tipos dela são o `PixKeyKind`.
+O telefone não tem uma escrita oficial única: a especificação dele aceita espaços, parênteses, hífens, pontos e um `+` no início, e lê os dígitos. A placa de veículo tem os seus dois tipos (`PlateKind`). A CNH, o título de eleitor e o RENAVAM não têm máscara oficial e são aceitos só como os seus dígitos (o título com ou sem os zeros à esquerda do sequencial); uma chave PIX é escrita como o DICT a guarda, sem máscara, e os tipos dela são o `PixKeyKind`.
 
 <!-- tested: forms -->
 ```php
@@ -49,7 +49,7 @@ BrSpec::cpf()->isSatisfiedBy(' 529.982.247-25'); // false (um espaço no início
 | Número de processo do CNJ | Vinte dígitos, o segmento do Judiciário de 1 a 9, os dígitos verificadores (ISO 7064 MOD 97-10). | O tribunal e a origem contra uma tabela. |
 | CNH | Onze dígitos, não uma repetição de um dígito, os dois dígitos verificadores (módulo 11, com o desconto do primeiro sobre o segundo; uma base cujo segundo dígito seria negativo não tem complemento). | Se a habilitação foi emitida ou está válida. |
 | PIS/PASEP | Onze dígitos, não zeros, o dígito verificador (módulo 11, pesos 3, 2, 9, 8, 7, 6, 5, 4, 3, 2). | Se o número foi atribuído. |
-| Título de eleitor | Doze dígitos, o código da UF de 01 a 28, os dois dígitos verificadores (módulo 11, com a regra de SP e MG). | Se a inscrição existe ou está regular. |
+| Título de eleitor | Até doze dígitos (os zeros à esquerda do sequencial podem ser desprezados), um sequencial diferente de zero, o código da UF de 01 a 28, os dois dígitos verificadores pelo "Módulo 11" (Resolução TSE 23.659/2021, art. 36; os pesos e a regra de SP e MG de descrições públicas da rotina do TSE). | Se a inscrição existe ou está regular. |
 | RENAVAM | Onze dígitos, não zeros, o dígito verificador (módulo 11). | Se o veículo está registrado. |
 | Chave PIX | A forma que o DICT guarda para o tipo: um CPF ou um CNPJ (o alfanumérico incluído) com as suas verificações, um celular `+55` com um DDD do plano de numeração, um e-mail em minúsculas de no máximo 77 caracteres, um UUID da RFC 4122 (versão 1 a 5) em minúsculas. | Se a chave está registrada no DICT, ou de quem é. |
 

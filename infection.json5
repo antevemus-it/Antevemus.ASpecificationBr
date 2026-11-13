@@ -4,8 +4,8 @@
 //   XDEBUG_MODE=off vendor/bin/infection --threads=max --only-covering-test-cases \
 //       --initial-tests-php-options="-d pcov.enabled=1 -d pcov.directory=$PWD/src"
 //
-// Measured on 2026-11-12 (1.1.0 against ASpecification 2.13.0, Infection 0.35.10, PHP 8.4.27 with pcov): 587
-// mutants, 573 killed, 0 errors, 0 syntax errors, 0 time-outs, 14 escaped, all equivalent:
+// Measured on 2026-11-13 (1.1.0 against ASpecification 2.13.0, Infection 0.35.10, PHP 8.4.27 with pcov): 592
+// mutants, 578 killed, 0 errors, 0 syntax errors, 0 time-outs, 14 escaped, all equivalent:
 // - nine (int) casts of a digit in an arithmetic expression (PHP converts a numeric string the same way): the
 //   CPF sum (1.0.0), the CNJ remainder loop (1.0.0), the two CNH sums, the sequence sum of the voter
 //   registration number and the two terms of its second sum, and the PIS/RENAVAM sum; and the (int) cast of the
@@ -14,7 +14,7 @@
 // - the (string) cast of a preg_replace() that cannot fail on a string (PhoneSpecification, 1.0.0);
 // - three str_repeat($value[1]) in the repetition checks of the CPF, the CNPJ (1.0.0) and the CNH (equal to the
 //   value only when every character is the same, as with $value[0]).
-// MSI 97.61%, covered-code MSI 97.61%, mutation code coverage 100%. The minimum scores are one integer point
+// MSI 97.64%, covered-code MSI 97.64%, mutation code coverage 100%. The minimum scores are one integer point
 // below.
 {
     "$schema": "vendor/infection/infection/resources/schema.json",

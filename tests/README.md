@@ -11,4 +11,4 @@ vendor/bin/phpunit
 | `Property/` | Properties over generated documents, with fixed seeds (`DocumentPropertyTest`, `RegistrationAndPixPropertyTest`). |
 | `Support/` | `DocumentGenerator`: fictitious documents whose check digits are computed by a route of its own, apart from `src/`. |
 
-1.0.0: 250 tests. 1.1.0: 527 tests. Mutation testing: see `infection.json5`.
+1.0.0: 250 tests. 1.1.0: 541 tests. Mutation testing: see `infection.json5`.

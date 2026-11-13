@@ -19,9 +19,11 @@ use PHPUnit\Framework\TestCase;
  * Properties of the specifications added in 1.1.0 over generated documents, with fixed seeds (a failure names
  * its seed and iteration, and `mt_srand(<seed>)` reproduces it).
  *
- * 1. Every generated CNH, voter registration number and RENAVAM is accepted; every generated PIS/PASEP is
- *    accepted, masked and unmasked, in the forms the format allows, and refused in the form it does not.
- * 2. Changing one check digit to any other digit is always refused.
+ * 1. Every generated CNH, voter registration number and RENAVAM is accepted, the voter registration number
+ *    also with the leading zeros of its sequence dropped; every generated PIS/PASEP is accepted, masked and
+ *    unmasked, in the forms the format allows, and refused in the form it does not.
+ * 2. Changing one check digit to any other digit is always refused (the voter registration number in both
+ *    of its forms).
  * 3. For the PIS/PASEP, `Any` answers exactly `Masked or Unmasked`, over noise strings and over generated
  *    numbers with random punctuation removed.
  * 4. A voter registration number with a state code outside 01 to 28 is refused, even with the check digits
@@ -52,7 +54,9 @@ final class RegistrationAndPixPropertyTest extends TestCase
         for ($i = 0; $i < self::ITERATIONS; $i++) {
             $where = "seed {$seed}, iteration {$i}";
             self::assertTrue((new CnhSpecification())->isSatisfiedBy(DocumentGenerator::cnh()), "{$where}: CNH");
-            self::assertTrue((new VoterIdSpecification())->isSatisfiedBy(DocumentGenerator::voterId()), "{$where}: voter registration number");
+            $voterId = DocumentGenerator::voterId();
+            self::assertTrue((new VoterIdSpecification())->isSatisfiedBy($voterId), "{$where}: voter registration number");
+            self::assertTrue((new VoterIdSpecification())->isSatisfiedBy(ltrim($voterId, '0')), "{$where}: voter registration number without leading zeros");
             self::assertTrue((new RenavamSpecification())->isSatisfiedBy(DocumentGenerator::renavam()), "{$where}: RENAVAM");
 
             $unmasked = DocumentGenerator::pis();
@@ -76,7 +80,8 @@ final class RegistrationAndPixPropertyTest extends TestCase
                 [new CnhSpecification(), DocumentGenerator::cnh(), [9, 10]],
                 [new PisSpecification(), DocumentGenerator::pis(), [10]],
                 [new PisSpecification(), DocumentGenerator::maskPis(DocumentGenerator::pis()), [13]],
-                [new VoterIdSpecification(), DocumentGenerator::voterId(), [10, 11]],
+                [new VoterIdSpecification(), $voterId = DocumentGenerator::voterId(), [10, 11]],
+                [new VoterIdSpecification(), $issued = ltrim($voterId, '0'), [strlen($issued) - 2, strlen($issued) - 1]],
                 [new RenavamSpecification(), DocumentGenerator::renavam(), [10]],
             ];
             foreach ($cases as [$specification, $document, $positions]) {

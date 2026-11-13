@@ -74,9 +74,11 @@ descriptions say so below), not by porting any implementation:
   by the public validators, followed literally.
 - PIS/PASEP (NIS/NIT) check digit: the routine of the Caixa as public
   descriptions give it.
-- Voter registration number: TSE Resolution 20.132/1998 (what each check
-  digit is computed over), with the weights and the rule of SP and MG of
-  public descriptions of the TSE routine.
+- Voter registration number: TSE Resolution 23.659/2021, art. 36, sole
+  paragraph (up to twelve digits, the leading zeros of the sequence dropped,
+  the state table 01 to 28, "Módulo 11" and what each check digit is
+  computed over), with the weights and the rule of SP and MG of public
+  descriptions of the TSE routine.
 - RENAVAM check digit: the routine of Denatran as public descriptions give
   it.
 - PIX keys: the Manual Operacional do DICT of the Banco Central (section 1,

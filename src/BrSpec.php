@@ -137,7 +137,8 @@ final class BrSpec
     }
 
     /**
-     * A voter registration number (título de eleitor): twelve digits, with the state code and two check digits.
+     * A voter registration number (título de eleitor): up to twelve digits (the leading zeros of the sequence may
+     * be dropped), with the state code and two check digits.
      *
      * @return VoterIdSpecification The leaf
      */

@@ -1,6 +1,6 @@
 # CNH, PIS/PASEP, título de eleitor e RENAVAM
 
-Quatro números de registro de onze ou doze dígitos, cada um com os seus dígitos verificadores. Só o PIS/PASEP tem máscara oficial, então é o único dos quatro com `DocumentFormat`; os outros três aceitam só os dígitos, e nada é aparado.
+Quatro números de registro de até doze dígitos, cada um com os seus dígitos verificadores. Só o PIS/PASEP tem máscara oficial, então é o único dos quatro com `DocumentFormat`; os outros três aceitam só os dígitos, e nada é aparado.
 
 ## `BrSpec::cnh(): CnhSpecification`
 
@@ -22,11 +22,12 @@ Um número do PIS/PASEP, o mesmo que a Caixa e a Previdência também escrevem c
 
 ## `BrSpec::voterId(): VoterIdSpecification`
 
-Um número de inscrição eleitoral (título de eleitor): doze dígitos, um sequencial de oito dígitos, o código da unidade da federação e dois dígitos verificadores.
+Um número de inscrição eleitoral (título de eleitor). A Resolução TSE 23.659/2021, art. 36, parágrafo único, o define com **até 12 algarismos**: um sequencial de oito algarismos cujos zeros à esquerda são desprezados na emissão, o código da unidade da Federação de origem e dois dígitos verificadores pelo "Módulo 11", o primeiro calculado sobre o número sequencial e o último sobre o código da UF seguido do primeiro dígito verificador.
 
-- **Código da UF:** `01` a `28` (`01` é SP, `02` é MG, `28` é o eleitor no exterior).
-- **Primeiro dígito verificador:** sobre o sequencial, com pesos de 2 a 9; **segundo:** sobre o código da UF e o primeiro dígito verificador, com pesos 7, 8 e 9. Cada um é o resto da divisão por 11; resto 10 dá 0, e resto 0 dá **1 para SP e MG** (0 nas demais).
-- O título imprime o número em três grupos de quatro, mas nenhuma norma fixa uma máscara: escreva os doze dígitos. Os números de treze dígitos de algumas inscrições antigas de SP e MG não são aceitos.
+- **Escrito com ou sem os zeros à esquerda:** uma string de 5 a 12 dígitos (pelo menos um dígito do sequencial) é lida completada com zeros à esquerda até doze, então `932305` e `000000932305` são o mesmo número. Um sequencial de zeros é recusado: nenhuma inscrição tem o número zero. Treze dígitos ou mais, e quatro ou menos, são recusados.
+- **Código da UF:** `01` a `28` (`01` é SP, `02` é MG, `28` é o exterior), a tabela da resolução.
+- **Pesos e restos:** a resolução não os dá; são os de descrições públicas da rotina do TSE. O primeiro dígito verificador é sobre o sequencial com pesos de 2 a 9, o segundo sobre o código da UF e o primeiro dígito verificador com pesos 7, 8 e 9; cada um é o resto da divisão por 11, resto 10 dá 0, e resto 0 dá **1 para SP e MG** (0 nas demais).
+- O título imprime o número em grupos, mas nenhuma norma fixa uma máscara: escreva só os dígitos.
 
 ## `BrSpec::renavam(): RenavamSpecification`
 
@@ -51,6 +52,7 @@ BrSpec::cnh()->isSatisfiedBy('11111111111'); // false (uma repetição)
 BrSpec::pis()->isSatisfiedBy('824.33543.31-5'); // true
 BrSpec::pis(DocumentFormat::Masked)->isSatisfiedBy('82433543315'); // false
 BrSpec::voterId()->isSatisfiedBy('847882780116'); // true (SP: resto 0 dá 1)
+BrSpec::voterId()->isSatisfiedBy('932305'); // true (os zeros à esquerda do sequencial desprezados, como na emissão)
 BrSpec::voterId()->isSatisfiedBy('818187202941'); // false (não há UF 29)
 BrSpec::renavam()->isSatisfiedBy('00144546329'); // true (um RENAVAM de nove dígitos com os zeros à esquerda)
 BrSpec::renavam()->isSatisfiedBy('144546329'); // false
