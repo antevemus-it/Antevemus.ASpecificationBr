@@ -13,9 +13,13 @@ namespace Antevemus\ASpecificationBr\Internal;
  * minus 48, and the two check digits stay numeric, so a numeric CNPJ gives the classic result. The CNJ routine
  * follows the ISO 7064 MOD 97-10 check of the unified process number (CNJ Resolution 65/2008).
  *
+ * The routines added in 1.1.0 (CNH, PIS/PASEP, voter registration number and RENAVAM) follow the public
+ * descriptions named in the docblock of each one, and say there what could not be checked against the text of
+ * an official norm (none of the four has its check digits published in one).
+ *
  * @internal Not part of the public API; the specifications are.
  *
- * @version    1.0.0
+ * @version    1.1.0
  * @package    Antevemus\ASpecificationBr
  * @subpackage Internal
  * @author     Heliton Junior (CTO) - <contato@antevemus.com.br>
@@ -121,6 +125,153 @@ final class CheckDigits
         }
 
         return $remainder === 1;
+    }
+
+    /**
+     * Whether eleven digits are the national registration number of a driver's license (CNH).
+     *
+     * Contran Resolution 886/2021 (art. 4, I) defines the number only as nine characters and two security check
+     * digits; no official text publishes how the check digits are computed. The routine here is the one
+     * attributed to Denatran and used by the public validators, followed literally so that a number they
+     * accept is accepted here:
+     *
+     *     dsc = 0
+     *     v = sum of d[i] * (9 - i), i = 0..8;  dv1 = v % 11;  if dv1 >= 10 then dv1 = 0 and dsc = 2
+     *     v = sum of d[i] * (1 + i), i = 0..8;  x = v % 11;   dv2 = x >= 10 ? 0 : x - dsc
+     *
+     * When the first remainder is 10 and the second is 0 or 1, x - dsc is negative: such a base has no valid
+     * completion and is never a CNH. A repetition of one digit passes the arithmetic and is refused.
+     *
+     * @param string $value Eleven characters
+     * @return bool True when both check digits are right
+     */
+    public static function isCnh(string $value): bool
+    {
+        if (preg_match('/^[0-9]{11}$/D', $value) !== 1 || $value === str_repeat($value[0], 11)) {
+            return false;
+        }
+
+        $first = 0;
+        $second = 0;
+        for ($i = 0; $i < 9; $i++) {
+            $first += ((int) $value[$i]) * (9 - $i);
+            $second += ((int) $value[$i]) * ($i + 1);
+        }
+
+        $first %= 11;
+        $discount = 0;
+        if ($first === 10) {
+            $first = 0;
+            $discount = 2; // the adjustment the first digit passes on to the second
+        }
+        $second %= 11;
+        $second = $second === 10 ? 0 : $second - $discount; // negative: no digit completes the base
+
+        return (int) $value[9] === $first && (int) $value[10] === $second;
+    }
+
+    /**
+     * Whether eleven digits are a PIS/PASEP number (also written NIS or NIT): ten digits and one check digit,
+     * the ten weighted 3, 2, 9, 8, 7, 6, 5, 4, 3, 2 under the modulo 11 rule (a remainder of 0 or 1 gives 0),
+     * the routine of the Caixa as public sources describe it (no norm with its text was found). Of the
+     * repetitions, only the zeros pass the arithmetic; they are refused.
+     *
+     * @param string $value Eleven characters, already without the mask
+     * @return bool True when the check digit is right
+     */
+    public static function isPis(string $value): bool
+    {
+        return self::isElevenDigitsWithOneCheckDigit($value);
+    }
+
+    /**
+     * Whether eleven digits are a RENAVAM (the national registry code of a vehicle): ten digits and one check
+     * digit. The routine of Denatran, as public sources describe it (no norm with its text was found), weights
+     * the ten digits 2, 3, 4, 5, 6, 7, 8, 9, 2, 3 from the right, takes ten times the sum modulo 11, and writes
+     * 0 for 10: the same digit as the PIS rule, since its weights read from the left are 3, 2, 9, 8, 7, 6, 5,
+     * 4, 3, 2 and ten times a sum is minus the sum modulo 11. A RENAVAM of nine digits, from before the
+     * eleven-digit numbering, is written with two leading zeros. Of the repetitions, only the zeros pass the
+     * arithmetic; they are refused.
+     *
+     * @param string $value Eleven characters
+     * @return bool True when the check digit is right
+     */
+    public static function isRenavam(string $value): bool
+    {
+        return self::isElevenDigitsWithOneCheckDigit($value);
+    }
+
+    /**
+     * Whether twelve digits are a voter registration number (título de eleitor): an eight-digit sequence, the
+     * code of the state (01 to 28: 01 is SP, 02 is MG, 28 is abroad) and two check digits, the first over the
+     * sequence weighted 2 to 9 and the second over the state code and the first check digit weighted 7, 8 and
+     * 9. TSE Resolution 20.132/1998 sets what each digit is computed over (the sequence; the state code
+     * followed by the first digit); the weights and the rule of the remainders are those of public
+     * descriptions of the TSE routine: each digit is the remainder modulo 11, a remainder of 10 gives 0, and a
+     * remainder of 0 gives 1 for SP and MG (0 elsewhere). The repetitions fail the state code or the
+     * arithmetic.
+     *
+     * @param string $value Twelve characters
+     * @return bool True when the state code and both check digits are right
+     */
+    public static function isVoterId(string $value): bool
+    {
+        if (preg_match('/^[0-9]{12}$/D', $value) !== 1) {
+            return false;
+        }
+
+        $state = (int) substr($value, 8, 2);
+        if ($state < 1 || $state > 28) {
+            return false;
+        }
+
+        $sum = 0;
+        for ($i = 0; $i < 8; $i++) {
+            $sum += ((int) $value[$i]) * ($i + 2);
+        }
+        $first = self::voterIdDigit($sum, $state);
+        $second = self::voterIdDigit(((int) $value[8]) * 7 + ((int) $value[9]) * 8 + $first * 9, $state);
+
+        return (int) $value[10] === $first && (int) $value[11] === $second;
+    }
+
+    /**
+     * Eleven digits whose last is the modulo 11 check digit of the ten before, weighted 3, 2, 9, 8, 7, 6, 5,
+     * 4, 3, 2; the zeros are refused.
+     *
+     * @param string $value Eleven characters
+     * @return bool True when the check digit is right
+     */
+    private static function isElevenDigitsWithOneCheckDigit(string $value): bool
+    {
+        if (preg_match('/^[0-9]{11}$/D', $value) !== 1 || $value === '00000000000') {
+            return false;
+        }
+
+        $sum = 0;
+        foreach ([3, 2, 9, 8, 7, 6, 5, 4, 3, 2] as $i => $weight) {
+            $sum += ((int) $value[$i]) * $weight;
+        }
+
+        return (int) $value[10] === self::modulo11($sum);
+    }
+
+    /**
+     * A check digit of the voter registration number.
+     *
+     * @param int $sum   Weighted sum
+     * @param int $state Code of the state, 1 to 28
+     * @return int Check digit from 0 to 9
+     */
+    private static function voterIdDigit(int $sum, int $state): int
+    {
+        $remainder = $sum % 11;
+
+        return match (true) {
+            $remainder === 10 => 0,
+            $remainder === 0 && $state <= 2 => 1, // SP (01) and MG (02)
+            default => $remainder,
+        };
     }
 
     /**

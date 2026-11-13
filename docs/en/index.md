@@ -3,7 +3,7 @@
 The official documentation of the package, one page per topic. The same pages exist in Portuguese (Brazil), in `docs/pt-BR`, and every PHP block of these pages is run by the test suite with the answers written in its comments.
 
 > **The Brazilian documents satellite of [ASpecification](https://github.com/antevemus-it/Antevemus.ASpecification) for PHP 8.2+**  
-> Leaf specifications for CPF, CNPJ (numeric and alphanumeric), CEP, phone number, vehicle plate (legacy and Mercosur) and CNJ court process number: check digits, the exact masked or unmasked form, a name for each one in the codec, and failure messages that never repeat the value under evaluation. They compose with the core's `and`, `or`, `not` and `Spec::property()`.
+> Leaf specifications for CPF, CNPJ (numeric and alphanumeric), CEP, phone number, vehicle plate (legacy and Mercosur), CNJ court process number, CNH, PIS/PASEP, voter registration number, RENAVAM and PIX key: check digits, the exact masked or unmasked form, a name for each one in the codec, and failure messages that never repeat the value under evaluation. They compose with the core's `and`, `or`, `not` and `Spec::property()`.
 
 ## Documentation Map
 
@@ -20,6 +20,8 @@ The official documentation of the package, one page per topic. The same pages ex
 - [CPF and CNPJ](api/taxpayer-ids.md): `BrSpec::cpf()`, `BrSpec::cnpj()` and the alphanumeric CNPJ.
 - [CEP and phone number](api/address-and-phone.md): `BrSpec::cep()`, `BrSpec::phone()`, the kinds of number and the area codes.
 - [Vehicle plate and CNJ process number](api/vehicle-and-court.md): `BrSpec::vehiclePlate()` and `BrSpec::cnjProcessNumber()`.
+- [CNH, PIS/PASEP, voter registration and RENAVAM](api/registration-numbers.md): `BrSpec::cnh()`, `BrSpec::pis()`, `BrSpec::voterId()` and `BrSpec::renavam()`.
+- [PIX keys](api/pix-keys.md): `BrSpec::pixKey()` and the kinds of key of the DICT.
 
 ### Quality
 

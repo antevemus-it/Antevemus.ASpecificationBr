@@ -11,13 +11,19 @@ use Antevemus\ASpecification\Spec;
 use Antevemus\ASpecificationBr\BrSpec;
 use Antevemus\ASpecificationBr\DocumentFormat;
 use Antevemus\ASpecificationBr\PhoneKind;
+use Antevemus\ASpecificationBr\PixKeyKind;
 use Antevemus\ASpecificationBr\PlateKind;
 use Antevemus\ASpecificationBr\Specifications\CepSpecification;
+use Antevemus\ASpecificationBr\Specifications\CnhSpecification;
 use Antevemus\ASpecificationBr\Specifications\CnjProcessNumberSpecification;
 use Antevemus\ASpecificationBr\Specifications\CnpjSpecification;
 use Antevemus\ASpecificationBr\Specifications\CpfSpecification;
 use Antevemus\ASpecificationBr\Specifications\PhoneSpecification;
+use Antevemus\ASpecificationBr\Specifications\PisSpecification;
+use Antevemus\ASpecificationBr\Specifications\PixKeySpecification;
+use Antevemus\ASpecificationBr\Specifications\RenavamSpecification;
 use Antevemus\ASpecificationBr\Specifications\VehiclePlateSpecification;
+use Antevemus\ASpecificationBr\Specifications\VoterIdSpecification;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
@@ -26,7 +32,7 @@ use ReflectionClass;
  * The facade, the codec and the secrecy of the failures, over a pool that holds every specification of
  * src/Specifications with every option: a class added there and left out of the pool fails the guard.
  *
- * @version    1.0.0
+ * @version    1.1.0
  * @package    Antevemus\ASpecificationBr\Tests
  * @subpackage Unit
  */
@@ -44,6 +50,7 @@ final class BrSpecAndCodecTest extends TestCase
             $pool[] = [new CpfSpecification($format), '876.047.238-38'];
             $pool[] = [new CepSpecification($format), '00999-999'];
             $pool[] = [new CnjProcessNumberSpecification($format), '1606504-42.2041.6.53.3394'];
+            $pool[] = [new PisSpecification($format), '824.33543.31-6'];
             foreach ([true, false] as $alphanumeric) {
                 $pool[] = [new CnpjSpecification($format, $alphanumeric), 'RN.0HY.F3C/2TQZ-91'];
             }
@@ -53,6 +60,12 @@ final class BrSpecAndCodecTest extends TestCase
         }
         foreach (PlateKind::cases() as $kind) {
             $pool[] = [new VehiclePlateSpecification($kind), 'BRA-2E19X'];
+        }
+        $pool[] = [new CnhSpecification(), '46602254572'];
+        $pool[] = [new VoterIdSpecification(), '309621560192'];
+        $pool[] = [new RenavamSpecification(), '34797468680'];
+        foreach (PixKeyKind::cases() as $kind) {
+            $pool[] = [new PixKeySpecification($kind), '+5520987654321'];
         }
 
         return $pool;
@@ -115,6 +128,13 @@ final class BrSpecAndCodecTest extends TestCase
             '{"t":"brPhone","kind":"landline"}' => BrSpec::phone(PhoneKind::Landline),
             '{"t":"brVehiclePlate","kind":"mercosur"}' => BrSpec::vehiclePlate(PlateKind::Mercosur),
             '{"t":"brCnjProcessNumber","format":"unmasked"}' => BrSpec::cnjProcessNumber(DocumentFormat::Unmasked),
+            '{"t":"brCnh"}' => BrSpec::cnh(),
+            '{"t":"brPis","format":"masked"}' => BrSpec::pis(DocumentFormat::Masked),
+            '{"t":"brVoterId"}' => BrSpec::voterId(),
+            '{"t":"brRenavam"}' => BrSpec::renavam(),
+            '{"t":"brPixKey","kind":"random"}' => BrSpec::pixKey(PixKeyKind::Random),
+            '{"t":"brPixKey","kind":"any"}' => BrSpec::pixKey(),
+            '{"t":"brPis","format":"any"}' => BrSpec::pis(),
         ];
         foreach ($expected as $spec => $specification) {
             self::assertSame('{"v":1,"spec":' . $spec . '}', $codec->toJson($specification));
@@ -156,6 +176,13 @@ final class BrSpecAndCodecTest extends TestCase
         self::assertEquals(new VehiclePlateSpecification(PlateKind::Mercosur), BrSpec::vehiclePlate(PlateKind::Mercosur));
         self::assertEquals(new CnjProcessNumberSpecification(DocumentFormat::Masked), BrSpec::cnjProcessNumber(DocumentFormat::Masked));
         self::assertEquals(new CnpjSpecification(), BrSpec::cnpj());
+        self::assertEquals(new CnhSpecification(), BrSpec::cnh());
+        self::assertEquals(new PisSpecification(DocumentFormat::Unmasked), BrSpec::pis(DocumentFormat::Unmasked));
+        self::assertEquals(new PisSpecification(), BrSpec::pis());
+        self::assertEquals(new VoterIdSpecification(), BrSpec::voterId());
+        self::assertEquals(new RenavamSpecification(), BrSpec::renavam());
+        self::assertEquals(new PixKeySpecification(PixKeyKind::Email), BrSpec::pixKey(PixKeyKind::Email));
+        self::assertEquals(new PixKeySpecification(), BrSpec::pixKey());
     }
 
     public function testTheDocumentsWithoutOptionsTakeTheDefaults(): void
@@ -187,6 +214,13 @@ final class BrSpecAndCodecTest extends TestCase
             'plate kind not a case' => [['t' => 'brVehiclePlate', 'kind' => 'old'], 'Key "kind" must be one of: any, legacy, mercosur.'],
             'alphanumeric not a boolean' => [['t' => 'brCnpj', 'alphanumeric' => 'yes'], 'Key "alphanumeric" must be a boolean.'],
             'alphanumeric as an integer' => [['t' => 'brCnpj', 'alphanumeric' => 1], 'Key "alphanumeric" must be a boolean.'],
+            'PIS format not a case' => [['t' => 'brPis', 'format' => 'pretty'], 'Key "format" must be one of: any, masked, unmasked.'],
+            'PIX kind not a case' => [['t' => 'brPixKey', 'kind' => 'evp'], 'Key "kind" must be one of: any, cpf, cnpj, phone, email, random.'],
+            'PIX kind not a string' => [['t' => 'brPixKey', 'kind' => null], 'Key "kind" must be one of: any, cpf, cnpj, phone, email, random.'],
+            'CNH takes no option' => [['t' => 'brCnh', 'format' => 'any'], 'Unknown key "format"'],
+            'voter registration number takes no option' => [['t' => 'brVoterId', 'kind' => 'any'], 'Unknown key "kind"'],
+            'RENAVAM takes no option' => [['t' => 'brRenavam', 'format' => 'unmasked'], 'Unknown key "format"'],
+            'PIX key takes no format' => [['t' => 'brPixKey', 'format' => 'any'], 'Unknown key "format"'],
         ];
     }
 
@@ -225,6 +259,10 @@ final class BrSpecAndCodecTest extends TestCase
         self::assertFalse($party->isSatisfiedBy((object) ['document' => '529.982.247-25', 'zip' => '01310100', 'phone' => '(21) 3456-7890']));
         self::assertFalse(BrSpec::vehiclePlate()->not()->isSatisfiedBy('BRA2E19'));
 
+        $driver = Spec::property('license', BrSpec::cnh())->and(Spec::property('vehicle', BrSpec::renavam()))->and(Spec::property('payout', BrSpec::pixKey()));
+        self::assertTrue($driver->isSatisfiedBy((object) ['license' => '46602254573', 'vehicle' => '34797468689', 'payout' => 'pix@bcb.gov.br']));
+        self::assertFalse($driver->isSatisfiedBy((object) ['license' => '46602254573', 'vehicle' => '34797468689', 'payout' => 'Pix@bcb.gov.br']));
+
         $result = Spec::property('document', BrSpec::cpf()->because('Informe um CPF válido.')->withCode('PARTY_CPF'))->evaluate((object) ['document' => '529.982.247-26']);
         self::assertSame(['PARTY_CPF'], $result->getCodes());
         self::assertSame(['Informe um CPF válido.'], array_values(array_unique($result->getReasons())));
@@ -239,6 +277,11 @@ final class BrSpecAndCodecTest extends TestCase
             'The value is not a valid Brazilian phone number.' => BrSpec::phone(),
             'The value is not a valid Brazilian vehicle plate.' => BrSpec::vehiclePlate(),
             'The value is not a valid CNJ process number.' => BrSpec::cnjProcessNumber(),
+            'The value is not a valid CNH number.' => BrSpec::cnh(),
+            'The value is not a valid PIS/PASEP number.' => BrSpec::pis(),
+            'The value is not a valid voter registration number.' => BrSpec::voterId(),
+            'The value is not a valid RENAVAM.' => BrSpec::renavam(),
+            'The value is not a valid PIX key.' => BrSpec::pixKey(),
         ];
         foreach ($messages as $message => $specification) {
             self::assertSame([$message], $specification->evaluate('x')->getReasons());

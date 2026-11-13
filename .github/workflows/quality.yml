@@ -1,7 +1,7 @@
 name: Quality
 
 # Mutation testing with Infection over the whole src/, with the minimum scores of infection.json5 (measured
-# locally for 1.0.0, set one point below).
+# locally for 1.1.0, set one point below).
 on:
   schedule:
     # Mondays, 07:17 UTC.

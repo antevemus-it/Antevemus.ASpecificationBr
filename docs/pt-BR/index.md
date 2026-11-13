@@ -3,7 +3,7 @@
 A documentação oficial do pacote, uma página por assunto. As mesmas páginas existem em inglês, em `docs/en`, e todo bloco PHP destas páginas roda na suíte de testes com as respostas escritas nos comentários.
 
 > **O satélite de documentos brasileiros da [ASpecification](https://github.com/antevemus-it/Antevemus.ASpecification) para PHP 8.2+**  
-> Especificações-folha para CPF, CNPJ (numérico e alfanumérico), CEP, telefone, placa de veículo (antiga e Mercosul) e número de processo do CNJ: dígitos verificadores, a forma exata com máscara ou sem máscara, um nome para cada uma no codec e mensagens de falha que nunca repetem o valor avaliado. Elas se compõem com o `and`, o `or`, o `not` e o `Spec::property()` do núcleo.
+> Especificações-folha para CPF, CNPJ (numérico e alfanumérico), CEP, telefone, placa de veículo (antiga e Mercosul), número de processo do CNJ, CNH, PIS/PASEP, título de eleitor, RENAVAM e chave PIX: dígitos verificadores, a forma exata com máscara ou sem máscara, um nome para cada uma no codec e mensagens de falha que nunca repetem o valor avaliado. Elas se compõem com o `and`, o `or`, o `not` e o `Spec::property()` do núcleo.
 
 ## Mapa da documentação
 
@@ -20,6 +20,8 @@ A documentação oficial do pacote, uma página por assunto. As mesmas páginas 
 - [CPF e CNPJ](api/taxpayer-ids.md): `BrSpec::cpf()`, `BrSpec::cnpj()` e o CNPJ alfanumérico.
 - [CEP e telefone](api/address-and-phone.md): `BrSpec::cep()`, `BrSpec::phone()`, os tipos de número e os DDDs.
 - [Placa de veículo e número de processo do CNJ](api/vehicle-and-court.md): `BrSpec::vehiclePlate()` e `BrSpec::cnjProcessNumber()`.
+- [CNH, PIS/PASEP, título de eleitor e RENAVAM](api/registration-numbers.md): `BrSpec::cnh()`, `BrSpec::pis()`, `BrSpec::voterId()` e `BrSpec::renavam()`.
+- [Chaves PIX](api/pix-keys.md): `BrSpec::pixKey()` e os tipos de chave do DICT.
 
 ### Qualidade
 

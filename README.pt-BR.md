@@ -6,7 +6,7 @@
 
 [English](README.md)
 
-**O satélite de documentos brasileiros da [ASpecification](https://github.com/antevemus-it/Antevemus.ASpecification) para PHP 8.2+.** Especificações-folha para CPF, CNPJ (numérico e alfanumérico), CEP, telefone, placa de veículo (antiga e Mercosul) e número de processo do CNJ: dígitos verificadores, a forma exata com máscara ou sem máscara, um nome para cada uma no codec e mensagens de falha que nunca repetem o valor avaliado. Elas se compõem com o `and`, o `or`, o `not` e o `Spec::property()` do núcleo.
+**O satélite de documentos brasileiros da [ASpecification](https://github.com/antevemus-it/Antevemus.ASpecification) para PHP 8.2+.** Especificações-folha para CPF, CNPJ (numérico e alfanumérico), CEP, telefone, placa de veículo (antiga e Mercosul), número de processo do CNJ, CNH, PIS/PASEP, título de eleitor, RENAVAM e chave PIX: dígitos verificadores, a forma exata com máscara ou sem máscara, um nome para cada uma no codec e mensagens de falha que nunca repetem o valor avaliado. Elas se compõem com o `and`, o `or`, o `not` e o `Spec::property()` do núcleo.
 
 Instale com `composer require antevemus/aspecification-br`.
 
@@ -43,6 +43,8 @@ A documentação oficial fica em [docs/pt-BR](docs/pt-BR/index.md) (e em inglês
 | [CPF e CNPJ](docs/pt-BR/api/taxpayer-ids.md) | `BrSpec::cpf()`, `BrSpec::cnpj()` e o CNPJ alfanumérico. |
 | [CEP e telefone](docs/pt-BR/api/address-and-phone.md) | `BrSpec::cep()`, `BrSpec::phone()` e os DDDs. |
 | [Placa de veículo e número de processo do CNJ](docs/pt-BR/api/vehicle-and-court.md) | `BrSpec::vehiclePlate()` e `BrSpec::cnjProcessNumber()`. |
+| [CNH, PIS/PASEP, título de eleitor e RENAVAM](docs/pt-BR/api/registration-numbers.md) | `BrSpec::cnh()`, `BrSpec::pis()`, `BrSpec::voterId()` e `BrSpec::renavam()`. |
+| [Chaves PIX](docs/pt-BR/api/pix-keys.md) | `BrSpec::pixKey()` e os tipos de chave do DICT. |
 | [Testes](docs/pt-BR/quality/tests.md) | A suíte, as propriedades e o teste de mutação. |
 | [Roadmap](docs/pt-BR/project/roadmap.md) | O que foi entregue e o que pode vir. |
 

@@ -36,6 +36,14 @@
         {
           "text": "Placa de veículo e número de processo do CNJ",
           "path": "api/vehicle-and-court"
+        },
+        {
+          "text": "CNH, PIS/PASEP, título de eleitor e RENAVAM",
+          "path": "api/registration-numbers"
+        },
+        {
+          "text": "Chaves PIX",
+          "path": "api/pix-keys"
         }
       ]
     },

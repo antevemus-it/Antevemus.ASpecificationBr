@@ -6,7 +6,7 @@
 
 [Português (Brasil)](README.pt-BR.md)
 
-**The Brazilian documents satellite of [ASpecification](https://github.com/antevemus-it/Antevemus.ASpecification) for PHP 8.2+.** Leaf specifications for CPF, CNPJ (numeric and alphanumeric), CEP, phone number, vehicle plate (legacy and Mercosur) and CNJ court process number: check digits, the exact masked or unmasked form, a name for each one in the codec, and failure messages that never repeat the value under evaluation. They compose with the core's `and`, `or`, `not` and `Spec::property()`.
+**The Brazilian documents satellite of [ASpecification](https://github.com/antevemus-it/Antevemus.ASpecification) for PHP 8.2+.** Leaf specifications for CPF, CNPJ (numeric and alphanumeric), CEP, phone number, vehicle plate (legacy and Mercosur), CNJ court process number, CNH, PIS/PASEP, voter registration number, RENAVAM and PIX key: check digits, the exact masked or unmasked form, a name for each one in the codec, and failure messages that never repeat the value under evaluation. They compose with the core's `and`, `or`, `not` and `Spec::property()`.
 
 Install with `composer require antevemus/aspecification-br`.
 
@@ -43,6 +43,8 @@ The official documentation lives in [docs/en](docs/en/index.md) (and in Portugue
 | [CPF and CNPJ](docs/en/api/taxpayer-ids.md) | `BrSpec::cpf()`, `BrSpec::cnpj()` and the alphanumeric CNPJ. |
 | [CEP and phone number](docs/en/api/address-and-phone.md) | `BrSpec::cep()`, `BrSpec::phone()` and the area codes. |
 | [Vehicle plate and CNJ process number](docs/en/api/vehicle-and-court.md) | `BrSpec::vehiclePlate()` and `BrSpec::cnjProcessNumber()`. |
+| [CNH, PIS/PASEP, voter registration and RENAVAM](docs/en/api/registration-numbers.md) | `BrSpec::cnh()`, `BrSpec::pis()`, `BrSpec::voterId()` and `BrSpec::renavam()`. |
+| [PIX keys](docs/en/api/pix-keys.md) | `BrSpec::pixKey()` and the kinds of key of the DICT. |
 | [Tests](docs/en/quality/tests.md) | The suite, the properties and the mutation testing. |
 | [Roadmap](docs/en/project/roadmap.md) | What shipped and what may come. |
 

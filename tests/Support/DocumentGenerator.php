@@ -13,12 +13,24 @@ namespace Antevemus\ASpecificationBr\Tests\Support;
  * - CNPJ: the two fixed tables of weights of the Receita Federal, the value of a character being its ASCII
  *   code minus 48;
  * - CNJ: the three-step computation of Annex VIII of CNJ Resolution 65/2008 (R1, R2, R3, DD = 98 - R3);
- * - area codes: the range 11..99 minus the codes the numbering plan of Anatel never assigned.
+ * - area codes: the range 11..99 minus the codes the numbering plan of Anatel never assigned;
+ * - CNH: the complementary weights (2 to 10 for the first digit, 10 down to 2 for the second, eleven minus each
+ *   weight of the routine), whose sums are minus the sums of the routine modulo 11, and the discount read from
+ *   the first remainder being 1; a base whose second digit would be negative is drawn again;
+ * - PIS/PASEP: the complementary weights 8, 9, 2, 3, 4, 5, 6, 7, 8, 9 (eleven minus each weight of the rule),
+ *   whose sum is minus the sum of the rule modulo 11, so the digit is that remainder (10 gives 0);
+ * - voter registration number: the complementary weights (9 down to 2 over the sequence, 4, 3 and 2 over the
+ *   state code and the first digit) and a table of the special remainders;
+ * - RENAVAM: Denatran's own writing, the ten digits reversed and weighted 2..9, 2, 3, ten times the sum
+ *   modulo 11;
+ * - PIX keys: the CPF and CNPJ above, a mobile number of the area codes above after "+55", an e-mail of the
+ *   characters of the DICT pattern, and a UUID of version 1 to 5 and of the RFC 4122 variant, built from its
+ *   sixteen bytes.
  *
  * Every value is drawn from mt_rand(), so a fixed seed (mt_srand) reproduces the sequence. Nothing here is a
  * real document; a generated value may coincide with a real one only by chance.
  *
- * @version    1.0.0
+ * @version    1.1.0
  * @package    Antevemus\ASpecificationBr\Tests
  * @subpackage Support
  */
@@ -27,6 +39,10 @@ final class DocumentGenerator
     private const CNPJ_WEIGHTS_1 = [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
     private const CNPJ_WEIGHTS_2 = [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
     private const ALPHANUMERIC = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    private const PIS_COMPLEMENT_WEIGHTS = [8, 9, 2, 3, 4, 5, 6, 7, 8, 9];
+    private const RENAVAM_WEIGHTS_FROM_THE_RIGHT = [2, 3, 4, 5, 6, 7, 8, 9, 2, 3];
+    private const EMAIL_LOCAL = 'abcdefghijklmnopqrstuvwxyz0123456789!#$\'*+/=?^_`{|}~-';
+    private const EMAIL_DOMAIN = 'abcdefghijklmnopqrstuvwxyz0123456789-';
     private const UNASSIGNED_AREA_CODES = [20, 23, 25, 26, 29, 30, 36, 39, 40, 50, 52, 56, 57, 58, 59, 60, 70, 72, 76, 78, 80, 90];
 
     /** Eleven digits of a CPF, not a repetition. */
@@ -141,6 +157,108 @@ final class DocumentGenerator
         return $mercosur ? $letters . mt_rand(0, 9) . self::letters(1) . self::digits(2) : $letters . self::digits(4);
     }
 
+    /** Eleven digits of a CNH registration number, not a repetition, of a base that has a completion. */
+    public static function cnh(): string
+    {
+        while (true) {
+            $base = self::digits(9);
+            if (preg_match('/^(\d)\1{8}$/', $base) === 1) {
+                continue;
+            }
+
+            // Weighted 2..10 the sum is minus the routine's sum (weights 9..1) modulo 11: a remainder of 1 here
+            // is the routine's remainder 10, which writes 0 and lowers the second digit by 2.
+            $complement = self::weighted($base, [2, 3, 4, 5, 6, 7, 8, 9, 10]) % 11;
+            $first = $complement < 2 ? 0 : 11 - $complement;
+            $discount = $complement === 1 ? 2 : 0;
+
+            // Weighted 10..2 the sum is minus the routine's sum (weights 1..9) modulo 11.
+            $remainder = (11 - self::weighted($base, [10, 9, 8, 7, 6, 5, 4, 3, 2]) % 11) % 11;
+            $second = $remainder === 10 ? 0 : $remainder - $discount;
+            if ($second >= 0) {
+                return $base . $first . $second;
+            }
+        }
+    }
+
+    /** Eleven digits of a PIS/PASEP number, not zeros. */
+    public static function pis(): string
+    {
+        do {
+            $base = self::digits(10);
+        } while ($base === '0000000000');
+
+        $digit = self::weighted($base, self::PIS_COMPLEMENT_WEIGHTS) % 11;
+
+        return $base . ($digit === 10 ? 0 : $digit);
+    }
+
+    /** The PIS/PASEP mask (###.#####.##-#) over eleven digits. */
+    public static function maskPis(string $digits): string
+    {
+        return substr($digits, 0, 3) . '.' . substr($digits, 3, 5) . '.' . substr($digits, 8, 2) . '-' . substr($digits, 10, 1);
+    }
+
+    /** Twelve digits of a voter registration number of the given state (1 to 28), or of any state. */
+    public static function voterId(?int $state = null): string
+    {
+        $sequence = self::digits(8);
+        $code = sprintf('%02d', $state ?? mt_rand(1, 28));
+        $special = in_array($code, ['01', '02'], true);
+
+        $first = self::voterIdDigit(self::weighted($sequence, [9, 8, 7, 6, 5, 4, 3, 2]), $special);
+        $second = self::voterIdDigit(self::weighted($code . $first, [4, 3, 2]), $special);
+
+        return $sequence . $code . $first . $second;
+    }
+
+    /** Eleven digits of a RENAVAM, not zeros. */
+    public static function renavam(): string
+    {
+        do {
+            $base = self::digits(10);
+        } while ($base === '0000000000');
+
+        $digit = (self::weighted(strrev($base), self::RENAVAM_WEIGHTS_FROM_THE_RIGHT) * 10) % 11;
+
+        return $base . ($digit === 10 ? 0 : $digit);
+    }
+
+    /** A mobile number as a PIX key: "+55", an area code, "9" and eight digits. */
+    public static function pixPhone(): string
+    {
+        return '+55' . self::phone(true);
+    }
+
+    /** A lowercase e-mail address of at most 77 characters, as a PIX key. */
+    public static function pixEmail(): string
+    {
+        $local = self::from(self::EMAIL_LOCAL, mt_rand(1, 20));
+        if (mt_rand(0, 1) === 1) {
+            $local .= '.' . self::from(self::EMAIL_LOCAL, mt_rand(1, 10));
+        }
+        $domain = self::from('abcdefghijklmnopqrstuvwxyz0123456789', 1) . self::from(self::EMAIL_DOMAIN, mt_rand(0, 12)) . 'x';
+
+        return $local . '@' . $domain . '.' . self::from('abcdefghijklmnopqrstuvwxyz', mt_rand(2, 6));
+    }
+
+    /** A random key (EVP) of the DICT: a UUID of version 1 to 5 and of the RFC 4122 variant, in small letters. */
+    public static function pixRandomKey(): string
+    {
+        $bytes = [];
+        for ($i = 0; $i < 16; $i++) {
+            $bytes[] = mt_rand(0, 255);
+        }
+        $bytes[6] = (mt_rand(1, 5) << 4) | ($bytes[6] & 0x0F); // version 1 to 5
+        $bytes[8] = 0x80 | ($bytes[8] & 0x3F); // variant of RFC 4122
+        $hex = '';
+        foreach ($bytes as $byte) {
+            $hex .= sprintf('%02x', $byte);
+        }
+
+        return substr($hex, 0, 8) . '-' . substr($hex, 8, 4) . '-' . substr($hex, 12, 4) . '-' . substr($hex, 16, 4) . '-' . substr($hex, 20, 12);
+    }
+
     /** A string of the given number of random digits. */
     public static function digits(int $count): string
     {
@@ -150,6 +268,37 @@ final class DocumentGenerator
         }
 
         return $digits;
+    }
+
+    /**
+     * @param list<int> $weights
+     */
+    private static function weighted(string $digits, array $weights): int
+    {
+        $sum = 0;
+        foreach ($weights as $i => $weight) {
+            $sum += (int) $digits[$i] * $weight;
+        }
+
+        return $sum;
+    }
+
+    /** The digit of a sum of complementary weights: minus that sum modulo 11, read through the table of the rule. */
+    private static function voterIdDigit(int $complementSum, bool $special): int
+    {
+        $remainder = (11 - $complementSum % 11) % 11;
+
+        return [0 => $special ? 1 : 0, 10 => 0][$remainder] ?? $remainder;
+    }
+
+    private static function from(string $alphabet, int $count): string
+    {
+        $out = '';
+        for ($i = 0; $i < $count; $i++) {
+            $out .= $alphabet[mt_rand(0, strlen($alphabet) - 1)];
+        }
+
+        return $out;
     }
 
     private static function letters(int $count): string

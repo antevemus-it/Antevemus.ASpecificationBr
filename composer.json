@@ -1,6 +1,6 @@
 {
   "name": "antevemus/aspecification-br",
-  "description": "Brazilian documents satellite of antevemus/aspecification: leaf specifications for CPF, CNPJ (numeric and alphanumeric), CEP, phone number, vehicle plate (legacy and Mercosur) and CNJ court process number, with check digits, exact masked or unmasked forms, codec registration and failure messages that never repeat the candidate",
+  "description": "Brazilian documents for antevemus/aspecification: CPF, CNPJ (alphanumeric too), CEP, phone, vehicle plate, CNJ process, CNH, PIS/PASEP, voter ID, RENAVAM and PIX key, with check digits, exact forms, codec names and failures that never echo the value",
   "type": "library",
   "license": "MIT",
   "homepage": "https://github.com/antevemus-it/Antevemus.ASpecificationBr",
@@ -20,6 +20,11 @@
     "cep",
     "mercosul",
     "cnj",
+    "cnh",
+    "pis",
+    "titulo-eleitor",
+    "renavam",
+    "pix",
     "php82"
   ],
   "authors": [

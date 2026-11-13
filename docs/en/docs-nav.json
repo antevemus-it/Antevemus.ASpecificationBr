@@ -36,6 +36,14 @@
         {
           "text": "Vehicle plate and CNJ process number",
           "path": "api/vehicle-and-court"
+        },
+        {
+          "text": "CNH, PIS/PASEP, voter registration and RENAVAM",
+          "path": "api/registration-numbers"
+        },
+        {
+          "text": "PIX keys",
+          "path": "api/pix-keys"
         }
       ]
     },

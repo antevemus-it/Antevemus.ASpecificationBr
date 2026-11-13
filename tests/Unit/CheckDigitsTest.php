@@ -13,7 +13,7 @@ use PHPUnit\Framework\TestCase;
  * The check-digit routines on their own, with input the specifications never pass them (a prefix, a suffix,
  * a trailing newline): the routines do not lean on the caller having checked the form.
  *
- * @version    1.0.0
+ * @version    1.1.0
  * @package    Antevemus\ASpecificationBr\Tests
  * @subpackage Unit
  */
@@ -27,6 +27,10 @@ final class CheckDigitsTest extends TestCase
         $cpf = '52998224725';
         $cnpj = '12ABC34501DE35';
         $cnj = '16065044120416533394';
+        $cnh = '46602254573';
+        $pis = '82433543315';
+        $voterId = '309621560191';
+        $renavam = '34797468689';
 
         return [
             'CPF' => ['isCpf', $cpf, true],
@@ -50,6 +54,33 @@ final class CheckDigitsTest extends TestCase
             'CNJ with a suffix' => ['isCnjProcessNumber', $cnj . 'x', false],
             'CNJ with a digit after' => ['isCnjProcessNumber', $cnj . '0', false],
             'CNJ with a newline' => ['isCnjProcessNumber', $cnj . "\n", false],
+            'CNH' => ['isCnh', $cnh, true],
+            'CNH with a prefix' => ['isCnh', 'x' . $cnh, false],
+            'CNH with a digit before' => ['isCnh', '0' . $cnh, false],
+            'CNH with a suffix' => ['isCnh', $cnh . 'x', false],
+            'CNH with a digit after' => ['isCnh', $cnh . '0', false],
+            'CNH with a newline' => ['isCnh', $cnh . "\n", false],
+            'CNH repetition' => ['isCnh', '55555555555', false],
+            'PIS' => ['isPis', $pis, true],
+            'PIS with a prefix' => ['isPis', 'x' . $pis, false],
+            'PIS with a digit before' => ['isPis', '0' . $pis, false],
+            'PIS with a suffix' => ['isPis', $pis . 'x', false],
+            'PIS with a digit after' => ['isPis', $pis . '0', false],
+            'PIS with a newline' => ['isPis', $pis . "\n", false],
+            'PIS zeros' => ['isPis', '00000000000', false],
+            'voter registration number' => ['isVoterId', $voterId, true],
+            'voter registration number with a prefix' => ['isVoterId', 'x' . $voterId, false],
+            'voter registration number with a digit before' => ['isVoterId', '0' . $voterId, false],
+            'voter registration number with a suffix' => ['isVoterId', $voterId . 'x', false],
+            'voter registration number with a digit after' => ['isVoterId', $voterId . '0', false],
+            'voter registration number with a newline' => ['isVoterId', $voterId . "\n", false],
+            'RENAVAM' => ['isRenavam', $renavam, true],
+            'RENAVAM with a prefix' => ['isRenavam', 'x' . $renavam, false],
+            'RENAVAM with a digit before' => ['isRenavam', '0' . $renavam, false],
+            'RENAVAM with a suffix' => ['isRenavam', $renavam . 'x', false],
+            'RENAVAM with a digit after' => ['isRenavam', $renavam . '0', false],
+            'RENAVAM with a newline' => ['isRenavam', $renavam . "\n", false],
+            'RENAVAM zeros' => ['isRenavam', '00000000000', false],
         ];
     }
 
@@ -64,6 +95,28 @@ final class CheckDigitsTest extends TestCase
         // 000.000.000-00 has right check digits arithmetically; only the repetition rule refuses it.
         self::assertFalse(CheckDigits::isCpf('00000000000'));
         self::assertFalse(CheckDigits::isCnpj('00000000000000'));
+    }
+
+    public function testEveryCnhRepetitionHasRightArithmeticAndIsRefused(): void
+    {
+        // Weighted 9..1 and 1..9 the sums of a repetition of d are 45 d, congruent to d: both check digits are d.
+        for ($digit = 0; $digit <= 9; $digit++) {
+            $repetition = str_repeat((string) $digit, 11);
+            self::assertSame($digit, (45 * $digit) % 11, 'both check digits of the repetition are right');
+            self::assertFalse(CheckDigits::isCnh($repetition), $repetition);
+        }
+    }
+
+    public function testOnlyTheZerosOfThePisAndRenavamRepetitionsHaveRightArithmetic(): void
+    {
+        // The rule refuses every other repetition by itself; the zeros are refused by the explicit check.
+        for ($digit = 1; $digit <= 9; $digit++) {
+            $repetition = str_repeat((string) $digit, 11);
+            self::assertFalse(CheckDigits::isPis($repetition), $repetition);
+            self::assertFalse(CheckDigits::isRenavam($repetition), $repetition);
+        }
+        self::assertFalse(CheckDigits::isPis('00000000000'));
+        self::assertFalse(CheckDigits::isRenavam('00000000000'));
     }
 
     public function testSegmentZeroIsRefusedEvenWithRightCheckDigits(): void

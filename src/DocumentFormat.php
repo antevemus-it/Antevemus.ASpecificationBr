@@ -11,9 +11,10 @@ namespace Antevemus\ASpecificationBr;
  * - `Masked`: only the official mask (`###.###.###-##` for a CPF, for example).
  * - `Unmasked`: only the bare characters, without any punctuation.
  *
- * Used by CpfSpecification, CnpjSpecification, CepSpecification and CnjProcessNumberSpecification.
+ * Used by CpfSpecification, CnpjSpecification, CepSpecification, CnjProcessNumberSpecification and
+ * PisSpecification.
  *
- * @version    1.0.0
+ * @version    1.1.0
  * @package    Antevemus\ASpecificationBr
  * @author     Heliton Junior (CTO) - <contato@antevemus.com.br>
  * @copyright  Copyright (c) 2026 Antevemus Soluções Inovadoras em TI Ltda.

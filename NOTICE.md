@@ -13,8 +13,10 @@ Antevemus ASpecification BR is the Brazilian documents satellite of Antevemus
 ASpecification (antevemus/aspecification) for PHP 8.2+. Its leaf
 specifications check that a string is written as a CPF, a CNPJ (numeric or
 alphanumeric), a postal code (CEP), a phone number, a vehicle plate (legacy or
-Mercosur) or a unified process number of the CNJ, with its check digits, and
-register under their own names in the core's specification codec.
+Mercosur), a unified process number of the CNJ, a driver's license number
+(CNH), a PIS/PASEP number, a voter registration number, a RENAVAM or a PIX key,
+with its check digits, and register under their own names in the core's
+specification codec.
 
 -------------------------------------------------------------------------------
 2. PROVENANCE — NOTHING PORTED
@@ -54,8 +56,9 @@ the same MIT License.
 4. PUBLIC RULES IMPLEMENTED
 -------------------------------------------------------------------------------
 
-The rules are public and were implemented from their official descriptions,
-not from any implementation:
+The rules are public and were implemented from their descriptions (official
+ones where a norm is named; for the rules no norm spells out, the public
+descriptions say so below), not by porting any implementation:
 
 - CPF and CNPJ check digits, including the alphanumeric CNPJ: Receita Federal
   do Brasil.
@@ -65,6 +68,20 @@ not from any implementation:
   Anatel.
 - Postal code range: Correios.
 - Legacy and Mercosur vehicle plates: Contran.
+- Driver's license registration number (CNH): Contran Resolution 886/2021
+  (nine characters and two security check digits; it does not publish their
+  algorithm), with the check-digit routine attributed to Denatran and used
+  by the public validators, followed literally.
+- PIS/PASEP (NIS/NIT) check digit: the routine of the Caixa as public
+  descriptions give it.
+- Voter registration number: TSE Resolution 20.132/1998 (what each check
+  digit is computed over), with the weights and the rule of SP and MG of
+  public descriptions of the TSE routine.
+- RENAVAM check digit: the routine of Denatran as public descriptions give
+  it.
+- PIX keys: the Manual Operacional do DICT of the Banco Central (section 1,
+  version 8.5) and the patterns of the DICT API specification (2.13.0);
+  RFC 4122 for the random key and RFC 5321 for the length of an e-mail local part.
 
 -------------------------------------------------------------------------------
 5. THIRD-PARTY COMPONENTS & LICENSES

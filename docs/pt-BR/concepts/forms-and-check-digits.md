@@ -10,7 +10,7 @@ Toda especificação deste pacote é uma **folha** da álgebra do núcleo: respo
 
 ## As formas
 
-CPF, CNPJ, CEP e o número de processo do CNJ têm máscara oficial. O `DocumentFormat` escolhe as formas aceitas:
+CPF, CNPJ, CEP, o número de processo do CNJ e o PIS/PASEP têm máscara oficial. O `DocumentFormat` escolhe as formas aceitas:
 
 | `DocumentFormat` | Aceita |
 | :--- | :--- |
@@ -18,7 +18,7 @@ CPF, CNPJ, CEP e o número de processo do CNJ têm máscara oficial. O `Document
 | `Masked` | Só a máscara oficial, como `###.###.###-##`. |
 | `Unmasked` | Só os caracteres, sem pontuação. |
 
-O telefone não tem uma escrita oficial única: a especificação dele aceita espaços, parênteses, hífens, pontos e um `+` no início, e lê os dígitos. A placa de veículo tem os seus dois tipos (`PlateKind`).
+O telefone não tem uma escrita oficial única: a especificação dele aceita espaços, parênteses, hífens, pontos e um `+` no início, e lê os dígitos. A placa de veículo tem os seus dois tipos (`PlateKind`). A CNH, o título de eleitor e o RENAVAM não têm máscara oficial e são aceitos só como os seus dígitos; uma chave PIX é escrita como o DICT a guarda, sem máscara, e os tipos dela são o `PixKeyKind`.
 
 <!-- tested: forms -->
 ```php
@@ -47,6 +47,11 @@ BrSpec::cpf()->isSatisfiedBy(' 529.982.247-25'); // false (um espaço no início
 | Telefone | Um DDD do plano de numeração; celular (`9` + 8 dígitos) ou fixo (`2` a `5` + 7 dígitos); o código do país `55` quando escrito. | Se a linha existe. |
 | Placa de veículo | O padrão antigo ou o Mercosul. | Se a placa está registrada. |
 | Número de processo do CNJ | Vinte dígitos, o segmento do Judiciário de 1 a 9, os dígitos verificadores (ISO 7064 MOD 97-10). | O tribunal e a origem contra uma tabela. |
+| CNH | Onze dígitos, não uma repetição de um dígito, os dois dígitos verificadores (módulo 11, com o desconto do primeiro sobre o segundo; uma base cujo segundo dígito seria negativo não tem complemento). | Se a habilitação foi emitida ou está válida. |
+| PIS/PASEP | Onze dígitos, não zeros, o dígito verificador (módulo 11, pesos 3, 2, 9, 8, 7, 6, 5, 4, 3, 2). | Se o número foi atribuído. |
+| Título de eleitor | Doze dígitos, o código da UF de 01 a 28, os dois dígitos verificadores (módulo 11, com a regra de SP e MG). | Se a inscrição existe ou está regular. |
+| RENAVAM | Onze dígitos, não zeros, o dígito verificador (módulo 11). | Se o veículo está registrado. |
+| Chave PIX | A forma que o DICT guarda para o tipo: um CPF ou um CNPJ (o alfanumérico incluído) com as suas verificações, um celular `+55` com um DDD do plano de numeração, um e-mail em minúsculas de no máximo 77 caracteres, um UUID da RFC 4122 (versão 1 a 5) em minúsculas. | Se a chave está registrada no DICT, ou de quem é. |
 
 Um dígito verificador pega um dígito digitado errado; não prova que o documento é de alguém.
 
@@ -70,7 +75,7 @@ BrSpec::cpf()->because('Informe um CPF válido.')->withCode('PARTY_CPF')->evalua
 
 ## O codec
 
-Uma regra gravada em JSON (o `SpecificationCodec` do núcleo, o `spec_json` do catálogo de regras) precisa dos nomes das especificações deste pacote. O `BrSpec::register()` os entrega a um codec: `brCpf`, `brCnpj`, `brCep`, `brPhone`, `brVehiclePlate` e `brCnjProcessNumber`, cada um só com as suas opções.
+Uma regra gravada em JSON (o `SpecificationCodec` do núcleo, o `spec_json` do catálogo de regras) precisa dos nomes das especificações deste pacote. O `BrSpec::register()` os entrega a um codec: `brCpf`, `brCnpj`, `brCep`, `brPhone`, `brVehiclePlate`, `brCnjProcessNumber`, `brCnh`, `brPis`, `brVoterId`, `brRenavam` e `brPixKey`, cada um só com as suas opções.
 
 <!-- tested: codec -->
 ```php

@@ -22,7 +22,7 @@ use Throwable;
  * message of the exception. Any other comment is prose. The reader is the one of
  * antevemus/aspecification-revolt 1.0.0, copied, with the marker required on every block.
  *
- * @version    1.0.0
+ * @version    1.1.0
  * @package    Antevemus\ASpecificationBr\Tests
  * @subpackage Unit
  */
@@ -37,6 +37,8 @@ final class DocumentationBlocksTest extends TestCase
         'taxpayer-ids' => 7,
         'address-and-phone' => 8,
         'vehicle-and-court' => 5,
+        'registration-numbers' => 9,
+        'pix-keys' => 9,
     ];
 
     /** The page of docs/<language> that hosts each tested block. */
@@ -48,6 +50,8 @@ final class DocumentationBlocksTest extends TestCase
         'taxpayer-ids' => 'api/taxpayer-ids',
         'address-and-phone' => 'api/address-and-phone',
         'vehicle-and-court' => 'api/vehicle-and-court',
+        'registration-numbers' => 'api/registration-numbers',
+        'pix-keys' => 'api/pix-keys',
     ];
 
     /** The README of each language: its only block is the Quick Start, run here too. */

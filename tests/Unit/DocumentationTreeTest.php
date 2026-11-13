@@ -7,7 +7,7 @@ namespace Antevemus\ASpecificationBr\Tests\Unit;
 use PHPUnit\Framework\TestCase;
 
 /**
- * DocumentationTreeTest - guard of the official documentation (1.0.0), copied from the one of
+ * DocumentationTreeTest - guard of the official documentation (1.1.0), copied from the one of
  * antevemus/aspecification-revolt 1.0.0 (itself adapted from antevemus/alinq-revolt 1.0.0).
  *
  * The README is an index and the documentation lives in docs/en and docs/pt-BR, one page per topic, in the
@@ -21,7 +21,7 @@ use PHPUnit\Framework\TestCase;
  * (h) nothing of the internal line leaks to a public page or README: no internal path, no Azure DevOps link,
  * and no relative link outside the language folders but to the public root files.
  *
- * @version    1.0.0
+ * @version    1.1.0
  * @package    Antevemus\ASpecificationBr\Tests
  * @subpackage Unit
  */
@@ -42,10 +42,12 @@ final class DocumentationTreeTest extends TestCase
         'api/taxpayer-ids' => 1, // CPF and CNPJ
         'api/address-and-phone' => 1, // CEP and phone number
         'api/vehicle-and-court' => 1, // vehicle plate and CNJ process number
+        'api/registration-numbers' => 1, // CNH, PIS/PASEP, voter registration number and RENAVAM
+        'api/pix-keys' => 1, // PIX keys
     ];
 
     /** Every block is tested: DocumentationBlocksTest::BLOCKS has as many. */
-    private const PHP_BLOCKS_TOTAL = 7;
+    private const PHP_BLOCKS_TOTAL = 9;
 
     /**
      * Material that lives only on the internal line (docs/RELEASING.md, the Reversa folders and the

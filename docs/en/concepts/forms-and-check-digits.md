@@ -10,7 +10,7 @@ Every specification of this package is a **leaf** of the core's algebra: it answ
 
 ## The forms
 
-CPF, CNPJ, CEP and the CNJ process number have an official mask. `DocumentFormat` chooses the forms accepted:
+CPF, CNPJ, CEP, the CNJ process number and the PIS/PASEP have an official mask. `DocumentFormat` chooses the forms accepted:
 
 | `DocumentFormat` | Accepts |
 | :--- | :--- |
@@ -18,7 +18,7 @@ CPF, CNPJ, CEP and the CNJ process number have an official mask. `DocumentFormat
 | `Masked` | Only the official mask, such as `###.###.###-##`. |
 | `Unmasked` | Only the bare characters. |
 
-The phone number has no single official writing: its specification accepts spaces, parentheses, hyphens, dots and one leading `+`, and reads the digits. The vehicle plate has its own two kinds (`PlateKind`).
+The phone number has no single official writing: its specification accepts spaces, parentheses, hyphens, dots and one leading `+`, and reads the digits. The vehicle plate has its own two kinds (`PlateKind`). The CNH, the voter registration number and the RENAVAM have no official mask and are accepted as their digits only; a PIX key is written as the DICT stores it, without a mask, and its kinds are `PixKeyKind`.
 
 <!-- tested: forms -->
 ```php
@@ -47,6 +47,11 @@ BrSpec::cpf()->isSatisfiedBy(' 529.982.247-25'); // false (a leading space)
 | Phone number | An area code of the numbering plan; mobile (`9` + 8 digits) or landline (`2` to `5` + 7 digits); the country code `55` when written. | Whether the line exists. |
 | Vehicle plate | The legacy or the Mercosur pattern. | Whether the plate is registered. |
 | CNJ process number | Twenty digits, the segment of the judiciary from 1 to 9, the check digits (ISO 7064 MOD 97-10). | The court and the origin against a table. |
+| CNH | Eleven digits, not a repetition of one digit, both check digits (modulo 11, with the discount of the first on the second; a base whose second digit would be negative has no completion). | Whether the license was issued or is valid. |
+| PIS/PASEP | Eleven digits, not zeros, the check digit (modulo 11, weights 3, 2, 9, 8, 7, 6, 5, 4, 3, 2). | Whether the number was assigned. |
+| Voter registration number | Twelve digits, the state code from 01 to 28, both check digits (modulo 11, with the rule of SP and MG). | Whether the registration exists or is regular. |
+| RENAVAM | Eleven digits, not zeros, the check digit (modulo 11). | Whether the vehicle is registered. |
+| PIX key | The form the DICT stores for the kind: a CPF or a CNPJ (alphanumeric included) with their checks, a mobile number `+55` with an area code of the numbering plan, an e-mail in small letters of at most 77 characters, a UUID of RFC 4122 (version 1 to 5) in small letters. | Whether the key is registered in the DICT, or to whom. |
 
 A check digit catches a mistyped digit; it does not prove the document belongs to anyone.
 
@@ -70,7 +75,7 @@ BrSpec::cpf()->because('Informe um CPF válido.')->withCode('PARTY_CPF')->evalua
 
 ## The codec
 
-A rule stored as JSON (the core's `SpecificationCodec`, the `spec_json` of the rule catalog) needs the names of this package's specifications. `BrSpec::register()` gives them to a codec: `brCpf`, `brCnpj`, `brCep`, `brPhone`, `brVehiclePlate` and `brCnjProcessNumber`, each with its options only.
+A rule stored as JSON (the core's `SpecificationCodec`, the `spec_json` of the rule catalog) needs the names of this package's specifications. `BrSpec::register()` gives them to a codec: `brCpf`, `brCnpj`, `brCep`, `brPhone`, `brVehiclePlate`, `brCnjProcessNumber`, `brCnh`, `brPis`, `brVoterId`, `brRenavam` and `brPixKey`, each with its options only.
 
 <!-- tested: codec -->
 ```php

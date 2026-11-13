@@ -6,11 +6,16 @@ namespace Antevemus\ASpecificationBr;
 
 use Antevemus\ASpecification\Serialization\SpecificationCodec;
 use Antevemus\ASpecificationBr\Specifications\CepSpecification;
+use Antevemus\ASpecificationBr\Specifications\CnhSpecification;
 use Antevemus\ASpecificationBr\Specifications\CnjProcessNumberSpecification;
 use Antevemus\ASpecificationBr\Specifications\CnpjSpecification;
 use Antevemus\ASpecificationBr\Specifications\CpfSpecification;
 use Antevemus\ASpecificationBr\Specifications\PhoneSpecification;
+use Antevemus\ASpecificationBr\Specifications\PisSpecification;
+use Antevemus\ASpecificationBr\Specifications\PixKeySpecification;
+use Antevemus\ASpecificationBr\Specifications\RenavamSpecification;
 use Antevemus\ASpecificationBr\Specifications\VehiclePlateSpecification;
+use Antevemus\ASpecificationBr\Specifications\VoterIdSpecification;
 
 /**
  * BrSpec - Facade of the Brazilian document specifications, and their registration in a codec.
@@ -20,7 +25,7 @@ use Antevemus\ASpecificationBr\Specifications\VehiclePlateSpecification;
  * repository falls back to memory for a leaf it cannot translate). `register()` gives a codec the names this
  * package writes as `t`, so a rule stored as JSON keeps them.
  *
- * @version    1.0.0
+ * @version    1.1.0
  * @package    Antevemus\ASpecificationBr
  * @author     Heliton Junior (CTO) - <contato@antevemus.com.br>
  * @copyright  Copyright (c) 2026 Antevemus Soluções Inovadoras em TI Ltda.
@@ -36,6 +41,11 @@ final class BrSpec
         'brPhone' => PhoneSpecification::class,
         'brVehiclePlate' => VehiclePlateSpecification::class,
         'brCnjProcessNumber' => CnjProcessNumberSpecification::class,
+        'brCnh' => CnhSpecification::class,
+        'brPis' => PisSpecification::class,
+        'brVoterId' => VoterIdSpecification::class,
+        'brRenavam' => RenavamSpecification::class,
+        'brPixKey' => PixKeySpecification::class,
     ];
 
     /**
@@ -103,6 +113,58 @@ final class BrSpec
     public static function cnjProcessNumber(DocumentFormat $format = DocumentFormat::Any): CnjProcessNumberSpecification
     {
         return new CnjProcessNumberSpecification($format);
+    }
+
+    /**
+     * The national registration number of a driver's license (CNH): eleven digits, two of them check digits.
+     *
+     * @return CnhSpecification The leaf
+     */
+    public static function cnh(): CnhSpecification
+    {
+        return new CnhSpecification();
+    }
+
+    /**
+     * A PIS/PASEP number (also NIS or NIT), masked (`###.#####.##-#`) or unmasked (eleven digits).
+     *
+     * @param DocumentFormat $format Forms accepted
+     * @return PisSpecification The leaf
+     */
+    public static function pis(DocumentFormat $format = DocumentFormat::Any): PisSpecification
+    {
+        return new PisSpecification($format);
+    }
+
+    /**
+     * A voter registration number (título de eleitor): twelve digits, with the state code and two check digits.
+     *
+     * @return VoterIdSpecification The leaf
+     */
+    public static function voterId(): VoterIdSpecification
+    {
+        return new VoterIdSpecification();
+    }
+
+    /**
+     * A RENAVAM, the national registry code of a vehicle: eleven digits, the last a check digit.
+     *
+     * @return RenavamSpecification The leaf
+     */
+    public static function renavam(): RenavamSpecification
+    {
+        return new RenavamSpecification();
+    }
+
+    /**
+     * A PIX key as the DICT stores it: a CPF, a CNPJ, a mobile number, an e-mail or a random key.
+     *
+     * @param PixKeyKind $kind Kind of key accepted
+     * @return PixKeySpecification The leaf
+     */
+    public static function pixKey(PixKeyKind $kind = PixKeyKind::Any): PixKeySpecification
+    {
+        return new PixKeySpecification($kind);
     }
 
     /**
